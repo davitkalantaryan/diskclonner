@@ -1,0 +1,7 @@
+
+/prj/*/*/*/*
+/prj/*/*/*
+!/prj/*/*_vs/*.vdproj
+!/prj/*/*_vs/*.sln
+!/prj/common/common_vs/*.props
+!/prj/common/common_vs/*/*.props
