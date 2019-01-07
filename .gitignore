@@ -2,6 +2,9 @@
 *~
 *.obj
 *.pro.user*
+contrib/sys/*
+constrib/sys/*/*
+constrib/sys/*/*/*
 /sys/*/.objects/*
 /sys/*/.objects/*/*
 /prj/*/*/*/*
