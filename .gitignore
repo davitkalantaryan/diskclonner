@@ -1,4 +1,9 @@
-
+*.[oa]
+*~
+*.obj
+*.pro.user*
+/sys/*/.objects/*
+/sys/*/.objects/*/*
 /prj/*/*/*/*
 /prj/*/*_qt/Makefile
 /prj/*/*_qt/*.cpp
