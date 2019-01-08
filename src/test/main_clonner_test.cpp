@@ -2,6 +2,9 @@
 // file:		main_clonner_test.cpp
 // created on:	2019 Jan 7
 //
+// docs:
+//		https://www.installsetupconfig.com/win32programming/windowsdiskapis2_3.html  
+//
 
 #ifdef _MSC_VER
 #pragma comment (lib,"zlib.lib")
@@ -317,6 +320,7 @@ int main()
 
 	nReturn = 0;
 returnPoint:
+	if(hDrive != INVALID_HANDLE_VALUE){CloseHandle(hDrive);}
 	return nReturn;
 }
 #else   // #ifdef BURN_DISK
