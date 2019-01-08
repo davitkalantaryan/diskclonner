@@ -290,7 +290,7 @@ static void PrintSize(int64_t a_llnSize)
 #define		NUMBER_REG_IN_SEC	512
 //#define		_devicename			TEXT( "\\\\.\\PhysicalDrive0")
 //#define		_devicename			TEXT( "\\\\.\\E:")
-#define		_devicename			"\\\\.\\PhysicalDrive1"
+#define		_devicename			"\\\\.\\PhysicalDrive6"
 
 
 #ifdef BURN_DISK
