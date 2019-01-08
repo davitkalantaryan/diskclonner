@@ -9,60 +9,201 @@
 #pragma warning(disable:4996)
 #endif
 
+#if 0
+#include <windows.h>
+#include <stdio.h>
 
-#include <Windows.h>
+void DisplayVolumePaths(
+	__in PWCHAR VolumeName
+)
+{
+	DWORD  CharCount = MAX_PATH + 1;
+	PWCHAR Names = NULL;
+	PWCHAR NameIdx = NULL;
+	BOOL   Success = FALSE;
+
+	for (;;)
+	{
+		//
+		//  Allocate a buffer to hold the paths.
+		Names = (PWCHAR) new BYTE[CharCount * sizeof(WCHAR)];
+
+		if (!Names)
+		{
+			//
+			//  If memory can't be allocated, return.
+			return;
+		}
+
+		//
+		//  Obtain all of the paths
+		//  for this volume.
+		Success = GetVolumePathNamesForVolumeNameW(
+			VolumeName, Names, CharCount, &CharCount
+		);
+
+		if (Success)
+		{
+			break;
+		}
+
+		if (GetLastError() != ERROR_MORE_DATA)
+		{
+			break;
+		}
+
+		//
+		//  Try again with the
+		//  new suggested size.
+		delete[] Names;
+		Names = NULL;
+	}
+
+	if (Success)
+	{
+		//
+		//  Display the various paths.
+		for (NameIdx = Names;
+			NameIdx[0] != L'\0';
+			NameIdx += wcslen(NameIdx) + 1)
+		{
+			wprintf(L"  %s", NameIdx);
+		}
+		wprintf(L"\n");
+	}
+
+	if (Names != NULL)
+	{
+		delete[] Names;
+		Names = NULL;
+	}
+
+	return;
+}
+
+void __cdecl wmain(void)
+{
+	DWORD  CharCount = 0;
+	WCHAR  DeviceName[MAX_PATH] = L"";
+	DWORD  Error = ERROR_SUCCESS;
+	HANDLE FindHandle = INVALID_HANDLE_VALUE;
+	BOOL   Found = FALSE;
+	size_t Index = 0;
+	BOOL   Success = FALSE;
+	WCHAR  VolumeName[MAX_PATH] = L"";
+
+	//
+	//  Enumerate all volumes in the system.
+	FindHandle = FindFirstVolumeW(VolumeName, ARRAYSIZE(VolumeName));
+
+	if (FindHandle == INVALID_HANDLE_VALUE)
+	{
+		Error = GetLastError();
+		wprintf(L"FindFirstVolumeW failed with error code %d\n", Error);
+		return;
+	}
+
+	for (;;)
+	{
+		//
+		//  Skip the \\?\ prefix and remove the trailing backslash.
+		Index = wcslen(VolumeName) - 1;
+
+		if (VolumeName[0] != L'\\' ||
+			VolumeName[1] != L'\\' ||
+			VolumeName[2] != L'?' ||
+			VolumeName[3] != L'\\' ||
+			VolumeName[Index] != L'\\')
+		{
+			Error = ERROR_BAD_PATHNAME;
+			wprintf(L"FindFirstVolumeW/FindNextVolumeW returned a bad path: %s\n", VolumeName);
+			break;
+		}
+
+		//
+		//  QueryDosDeviceW does not allow a trailing backslash,
+		//  so temporarily remove it.
+		VolumeName[Index] = L'\0';
+
+		CharCount = QueryDosDeviceW(&VolumeName[4], DeviceName, ARRAYSIZE(DeviceName));
+
+		VolumeName[Index] = L'\\';
+
+		if (CharCount == 0)
+		{
+			Error = GetLastError();
+			wprintf(L"QueryDosDeviceW failed with error code %d\n", Error);
+			break;
+		}
+
+		wprintf(L"\nFound a device:\n %s", DeviceName);
+		wprintf(L"\nVolume name: %s", VolumeName);
+		wprintf(L"\nPaths:");
+		DisplayVolumePaths(VolumeName);
+
+		//
+		//  Move on to the next volume.
+		Success = FindNextVolumeW(FindHandle, VolumeName, ARRAYSIZE(VolumeName));
+
+		if (!Success)
+		{
+			Error = GetLastError();
+
+			if (Error != ERROR_NO_MORE_FILES)
+			{
+				wprintf(L"FindNextVolumeW failed with error code %d\n", Error);
+				break;
+			}
+
+			//
+			//  Finished iterating
+			//  through all the volumes.
+			Error = ERROR_SUCCESS;
+			break;
+		}
+	}
+
+	FindVolumeClose(FindHandle);
+	FindHandle = INVALID_HANDLE_VALUE;
+
+	return;
+}
+
+#endif
+
+
+#if 1
+
+#include "zlib_compression_routines.h"
+#include "zlib_decompress_routines.h"
 #include <stdio.h>
 #include <iostream>
-#include <stdint.h>
+
+
+#if 0
 
 static void PrintSize(int64_t a_llnSize);
 
 int main()
 {
+	ULARGE_INTEGER liFreeBytesAvailableToCaller, liTotalNumberOfBytes, lipTotalNumberOfFreeBytes;
 	union {DRIVE_LAYOUT_INFORMATION_EX i;char b[8192];}dli;
-	PARTITION_INFORMATION_EX pi;
 	DISK_GEOMETRY_EX dg;
-	//STORAGE_PROPERTY_QUERY spq;
 	STORAGE_PROPERTY_QUERY spq = { StorageDeviceProperty, PropertyStandardQuery };
 	STORAGE_DEVICE_DESCRIPTOR sdd;
 	HANDLE hDrive;
-	DWORD dwReturned, dwLogicalDrives;
+	DWORD dwReturned;
 	BOOL bSuccs;
 	char _devicename[] = "\\\\.\\PhysicalDriveX";
-	char logicalDrive[] = "\\\\.\\A:";
 	char cLast('0' + 10);
-	//wchar_t vcVolumeName[128];
-	char vcFileSyst2[128];
 	char cDrv;
-	DWORD bitWs, i;
 
-#if 1
-	DWORD dwVolumeSerialNumber, dwpMaximumComponentLength, dwFileSystemFlags;
-	char vcVolumeName[128];
-	char vcVolumeNameBuf[128];
-	HANDLE hFirstVolume = FindFirstVolumeA(vcVolumeName, 127);
-	if (hFirstVolume != INVALID_HANDLE_VALUE) {
-		do {
-			bSuccs = GetVolumeInformationA(vcVolumeName, vcVolumeNameBuf, 127, &dwVolumeSerialNumber, &dwpMaximumComponentLength, &dwFileSystemFlags, vcFileSyst2, 127);
-			printf("volume:  %s\t", vcVolumeName);
-			if (bSuccs) {
-				printf("name:\"%s\", fileSy:\"%s\"", vcVolumeNameBuf, vcFileSyst2);
-			}
-			printf("\n");
 #if 0
-			hDrive = CreateFileA(vcVolume, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-			printf("hDrive[%s]=%p\t", vcVolume, hDrive);
-			if (hDrive == INVALID_HANDLE_VALUE) { printf("\n"); continue; }
-			bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_PARTITION_INFO, NULL, 0, &pi, sizeof(pi), &dwReturned, NULL);
-			if (bSuccs) {
-				PrintSize(pi.PartitionLength.QuadPart);
-			}
-			printf("\n");
-			CloseHandle(hDrive);
-#endif
-		} while (FindNextVolumeA(hFirstVolume, vcVolumeName, 127));
-		FindVolumeClose(hFirstVolume);
-		printf("\n\n");
+	hDrive = CreateFileA("\\Device\\HarddiskVolume1", GENERIC_READ, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (hDrive != INVALID_HANDLE_VALUE) { CloseHandle(hDrive); }
+	bSuccs = GetDiskFreeSpaceExA("Volume{7ae24770-0000-0000-0000-100000000000}", &liFreeBytesAvailableToCaller, &liTotalNumberOfBytes, &lipTotalNumberOfFreeBytes);
+	if (!bSuccs) {
+		printf(", GetDiskFreeSpaceExA:lastError=%d", GetLastError());
 	}
 #endif
 
@@ -71,57 +212,28 @@ int main()
 		hDrive = CreateFileA(_devicename, GENERIC_READ, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 		printf("hDrive%c=%p\t", cDrv, hDrive);
 		if (hDrive == INVALID_HANDLE_VALUE) { printf("\n"); continue; }
-		//GetVolumeInformationByHandleW(hDrive, vcVolume, 127, NULL, NULL, NULL, vcFileSyst, 127);
 		bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0, &dg, sizeof(dg), &dwReturned, NULL);
 		if (bSuccs) {
 			PrintSize(dg.DiskSize.QuadPart);
 		}
 		else {
-			printf(", lastError=%d", GetLastError());
-		}
-		bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_PARTITION_INFO_EX, NULL, 0, &pi, sizeof(pi), &dwReturned, NULL);
-		if (bSuccs) {
-			//PrintSize(pi.PartitionLength.QuadPart);
-		}
-		else {
-			printf(", lastError=%d", GetLastError());
+			printf(", GET_DRIVE_GEOMETRY:lastError=%d", GetLastError());
 		}
 		bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0, &dli, sizeof(dli), &dwReturned, NULL);
-		if (bSuccs) {
-			//PrintSize(pi.dli.PartitionLength.QuadPart);
-		}
-		else {
-			printf(", lastError=%d",GetLastError());
+		if (!bSuccs) {
+			printf(", GET_DRIVE_LAYOUT:lastError=%d",GetLastError());
 		}
 		bSuccs = DeviceIoControl(hDrive, IOCTL_STORAGE_QUERY_PROPERTY,&spq, sizeof(spq), &sdd, sizeof(sdd), &dwReturned, NULL);
 		if (bSuccs) {
-			//PrintSize(pi.dli.PartitionLength.QuadPart);
+			printf(", %s", sdd.RemovableMedia?"removable":"not_removable");
 		}
 		else {
-			printf(", lastError=%d", GetLastError());
+			printf(", STORAGE_QUERY_PROPERTY:lastError=%d", GetLastError());
 		}
 		printf("\n");
 		CloseHandle(hDrive);
 	}
 
-	dwLogicalDrives = GetLogicalDrives();
-	printf("\nlogicalDrives=%x\n\n", dwLogicalDrives);
-
-	for (i = 0, bitWs = 1; i < 32; ++i, bitWs <<= 1) {
-		if (!(bitWs&dwLogicalDrives)) { continue; }
-		logicalDrive[4] = 'A' + char(i);
-		hDrive = CreateFileA(logicalDrive, GENERIC_READ, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-		printf("hDrive[%s]=%p\t", logicalDrive, hDrive);
-		if (hDrive == INVALID_HANDLE_VALUE) { printf("\n"); continue; }
-		//GetVolumeInformationByHandleW(hDrive, vcVolume, 127, NULL, NULL, NULL, vcFileSyst, 127);
-		//bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_PARTITION_INFO, NULL, 0, &pi, sizeof(pi), &dwReturned, NULL);//IOCTL_DISK_GET_DRIVE_LAYOUT
-		bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_DRIVE_LAYOUT, NULL, 0, &pi, sizeof(pi), &dwReturned, NULL);
-		if (bSuccs) {
-			//PrintSize(pi.m_pi.PartitionLength.QuadPart);
-		}
-		printf("\n");
-		CloseHandle(hDrive);
-	}
 
 	return 0;
 }
@@ -162,153 +274,20 @@ static void PrintSize(int64_t a_llnSize)
 
 }
 
-
-#if 0
-
-#include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
-#include <string.h>
-#include <psapi.h>
-#include <strsafe.h>
-
-#define BUFSIZE 512
-
-BOOL GetFileNameFromHandle(HANDLE hFile)
-{
-	BOOL bSuccess = FALSE;
-	TCHAR pszFilename[MAX_PATH + 1];
-	HANDLE hFileMap;
-
-	// Get the file size.
-	DWORD dwFileSizeHi = 0;
-	DWORD dwFileSizeLo = GetFileSize(hFile, &dwFileSizeHi);
-
-	if (dwFileSizeLo == 0 && dwFileSizeHi == 0)
-	{
-		_tprintf(TEXT("Cannot map a file with a length of zero.\n"));
-		return FALSE;
-	}
-
-	// Create a file mapping object.
-	hFileMap = CreateFileMapping(hFile,
-		NULL,
-		PAGE_READONLY,
-		0,
-		1,
-		NULL);
-
-	if (hFileMap)
-	{
-		// Create a file mapping to get the file name.
-		void* pMem = MapViewOfFile(hFileMap, FILE_MAP_READ, 0, 0, 1);
-
-		if (pMem)
-		{
-			if (GetMappedFileName(GetCurrentProcess(),
-				pMem,
-				pszFilename,
-				MAX_PATH))
-			{
-
-				// Translate path with device name to drive letters.
-				TCHAR szTemp[BUFSIZE];
-				szTemp[0] = '\0';
-
-				if (GetLogicalDriveStrings(BUFSIZE - 1, szTemp))
-				{
-					TCHAR szName[MAX_PATH];
-					TCHAR szDrive[3] = TEXT(" :");
-					BOOL bFound = FALSE;
-					TCHAR* p = szTemp;
-
-					do
-					{
-						// Copy the drive letter to the template string
-						*szDrive = *p;
-
-						// Look up each device name
-						if (QueryDosDevice(szDrive, szName, MAX_PATH))
-						{
-							size_t uNameLen = _tcslen(szName);
-
-							if (uNameLen < MAX_PATH)
-							{
-								bFound = _tcsnicmp(pszFilename, szName, uNameLen) == 0
-									&& *(pszFilename + uNameLen) == _T('\\');
-
-								if (bFound)
-								{
-									// Reconstruct pszFilename using szTempFile
-									// Replace device path with DOS path
-									TCHAR szTempFile[MAX_PATH];
-									StringCchPrintf(szTempFile,
-										MAX_PATH,
-										TEXT("%s%s"),
-										szDrive,
-										pszFilename + uNameLen);
-									StringCchCopyN(pszFilename, MAX_PATH + 1, szTempFile, _tcslen(szTempFile));
-				}
-			  }
-			}
-
-						// Go to the next NULL character.
-						while (*p++);
-		  } while (!bFound && *p); // end of string
-		}
-	  }
-			bSuccess = TRUE;
-			UnmapViewOfFile(pMem);
-	}
-
-		CloseHandle(hFileMap);
-  }
-	_tprintf(TEXT("File name is %s\n"), pszFilename);
-	return(bSuccess);
-}
-
-int _tmain(int argc, TCHAR *argv[])
-{
-	HANDLE hFile;
-
-	if (argc != 2)
-	{
-		_tprintf(TEXT("This sample takes a file name as a parameter.\n"));
-		return 0;
-	}
-	hFile = CreateFile(argv[1], GENERIC_READ, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, 0, NULL);
-
-	if (hFile == INVALID_HANDLE_VALUE)
-	{
-		_tprintf(TEXT("CreateFile failed with %d\n"), GetLastError());
-		return 0;
-	}
-	GetFileNameFromHandle(hFile);
-}
-
-
 #endif
 
 
 
-#if 0
+#if 1
 
-#ifndef CINTERFACE
-#define CINTERFACE
-#endif
 
 #define BURN_DISK
 
-#include "zlib_compression_routines.h"
-#include "zlib_decompress_routines.h"
-
-#include <Windows.h>
-#include <stdio.h>
 
 #define		NUMBER_REG_IN_SEC	512
 //#define		_devicename			TEXT( "\\\\.\\PhysicalDrive0")
-#define		_devicename			TEXT( "\\\\.\\E:")
+//#define		_devicename			TEXT( "\\\\.\\E:")
+#define		_devicename			"\\\\.\\PhysicalDrive1"
 
 
 #ifdef BURN_DISK
@@ -322,7 +301,7 @@ int main()
 	BOOL bSuccs;
 	DISK_GEOMETRY_EX dg;
 	//PARTITION_INFORMATION dg;
-	HANDLE hDrive = CreateFile(_devicename, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE hDrive = CreateFile(_devicename, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if(hDrive == INVALID_HANDLE_VALUE){goto returnPoint;}
 
@@ -352,7 +331,7 @@ int main()
 	fpOut = fopen(DEST_FILE_NAME, "wb");
 	if(!fpOut){goto returnPoint;}
 
-	ZlibCompressDriveRaw(_devicename,fpOut,Z_DEFAULT_COMPRESSION);
+	ZlibCompressDiskRaw(_devicename,fpOut,Z_DEFAULT_COMPRESSION);
 
 	nReturn = 0;
 returnPoint:
@@ -365,3 +344,6 @@ returnPoint:
 
 
 #endif  // #if 0
+
+
+#endif
