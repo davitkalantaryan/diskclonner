@@ -30,11 +30,11 @@
     <ClCompile Include="..\..\..\contrib\zlib\src\util\zlib_decompress_routines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\core\disk_clone_by_zipping_and_partition_using_zip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\contrib\zlib\include\create_process_functionalities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\contrib\zlib\include\zlib_compress_decompress_common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,6 +45,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\contrib\zlib\include\zlib_first_include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\disk_clone_by_zipping_and_partition_using_zip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\common_disk_clonner_project_include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\include\private_header_for_compress_decompress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
