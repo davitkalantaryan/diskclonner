@@ -3,6 +3,9 @@
 // created on:	2019 Jan 09
 //
 
+
+#define _TEST_BY_RUFUS
+
 #define KEEP_C_NOMINMAX
 
 #include <common_disk_clonner_project_include.h>
@@ -19,6 +22,12 @@ BEGIN_C_DECLS2
 #include "../include/private_header_for_compress_decompress.h"
 
 #define DEF_CHUNK_SIZE				16384  // 2^14
+#ifndef DRIVE_ACCESS_TIMEOUT_NEW
+#define DRIVE_ACCESS_TIMEOUT_NEW	10000
+#endif
+#define DRIVE_ACCESS_SLEEP_TIME		100
+
+BOOL CreatePartition(HANDLE hDrive, int partition_style, int file_system, BOOL mbr_uefi_marker, uint8_t extra_partitions);
 
 typedef struct SUserDataForDrive
 {
@@ -74,7 +83,7 @@ int DecompressFromPathOrUrlAndPrepareDisk(const char* a_driveName, const char* a
 	z_stream strm;
 	unsigned char in[DEF_CHUNK_SIZE];
 	unsigned char out[DEF_CHUNK_SIZE];
-	HANDLE hDrive = CreateFileA(a_driveName, GENERIC_READ|GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+	HANDLE hDrive = CreateFileA(a_driveName, GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
 	if (hDrive == INVALID_HANDLE_VALUE) { goto returnPoint; }
 
 	isOk = DeviceIoControl(hDrive,IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,NULL,0,&drvGeo,sizeof(drvGeo),&dwReturned, NULL);//_PARTITION_INFORMATION
@@ -159,7 +168,7 @@ int CompressDiskToPathOrUrl(const char* a_driveName, const char* a_cpcPathOrUrl,
 	DWORD dwReturned;
 	BOOL bSuccs;
 	
-	hDrive = CreateFile(a_driveName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	hDrive = CreateFileA(a_driveName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (hDrive == INVALID_HANDLE_VALUE) { return -2; }
 
 	bSuccs = DeviceIoControl(hDrive, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, NULL, 0, &dg2, sizeof(dg2), &dwReturned, NULL);
@@ -354,6 +363,13 @@ static int CallbackForCompressToFileOrUrl(const void*a_buffer, int a_bufLen, voi
 }
 
 
+#ifdef _TEST_BY_RUFUS
+#include "rufus.h"
+#include "drive.h"
+extern RUFUS_DRIVE_INFO SelectedDrive;
+#endif
+
+
 static int CallbackForDecompressToDrive(const void*a_buffer, int a_bufLen, void*a_userData)
 {
 	static const int64_t scnHeaderSize(sizeof(SDiskCompDecompHeader));
@@ -389,14 +405,42 @@ static int CallbackForDecompressToDrive(const void*a_buffer, int a_bufLen, void*
 
 		if (pUserData->alreadyReadBytes >= (int64_t)pUserData->dch->wholeHeaderSizeInBytes) {
 			DRIVE_LAYOUT_INFORMATION_EX* pDiskInfo = DISK_INFO_FROM_ITEM(pUserData->dch);
+			uint64_t EndTime;
 			CREATE_DISK aDiskStr;
+			DISK_GEOMETRY_EX drvGeo;
 			DWORD dwReturned, dwInpLen = (DWORD)(pUserData->dch->wholeHeaderSizeInBytes - sizeof(SDiskCompDecompHeader));
 			BOOL isOk ;
 			//BOOL bSuccs = DeviceIoControl(pUserData->driveHandle,IOCTL_DISK_SET_DRIVE_LAYOUT_EX,DISK_INFO_FROM_ITEM(pUserData->dch),dwInpLen,NULL,0, &dwReturned, NULL);
 
+			DeviceIoControl(pUserData->driveHandle,FSCTL_ALLOW_EXTENDED_DASD_IO,NULL,0,NULL,0,&dwReturned,NULL);
+
+			EndTime = GetTickCount64() + DRIVE_ACCESS_TIMEOUT_NEW;
+			isOk = FALSE;
+			do {
+				if(DeviceIoControl(pUserData->driveHandle,FSCTL_LOCK_VOLUME,NULL,0,NULL,0,&dwReturned,NULL)){isOk = TRUE;break;}
+				SleepMsIntr(DRIVE_ACCESS_SLEEP_TIME);
+			} while (GetTickCount64() < EndTime);
+			if (!isOk) {
+				int nReturnLoc = GetLastError();
+				return -nReturnLoc;
+			}
+
+			isOk = DeviceIoControl(pUserData->driveHandle,IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,NULL,0,&drvGeo,sizeof(drvGeo),&dwReturned, NULL);//_PARTITION_INFORMATION
+			if (!isOk) { return -1; }
+
 			aDiskStr.PartitionStyle = (PARTITION_STYLE)DISK_INFO_FROM_ITEM(pUserData->dch)->PartitionStyle;
 			aDiskStr.Gpt.DiskId = DISK_INFO_FROM_ITEM(pUserData->dch)->Gpt.DiskId;
 			aDiskStr.Gpt.MaxPartitionCount = DISK_INFO_FROM_ITEM(pUserData->dch)->Gpt.MaxPartitionCount;
+
+#ifdef _TEST_BY_RUFUS
+			SelectedDrive.DiskSize = drvGeo.DiskSize.QuadPart;
+			SelectedDrive.DeviceNumber = 1;
+			SelectedDrive.SectorsPerTrack = drvGeo.Geometry.SectorsPerTrack;
+			SelectedDrive.SectorSize = drvGeo.Geometry.SectorsPerTrack;
+			SelectedDrive.FirstDataSector = 0; // DK todo:
+			SelectedDrive.MediaType = drvGeo.Geometry.MediaType;
+			CreatePartition(pUserData->driveHandle, aDiskStr.PartitionStyle, FS_FAT32, 0, 0);
+#endif
 
 			isOk = DeviceIoControl(pUserData->driveHandle, IOCTL_DISK_CREATE_DISK, &aDiskStr, sizeof(aDiskStr), NULL, 0, &dwReturned, NULL);
 			if (!isOk) {

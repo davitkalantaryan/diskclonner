@@ -37,40 +37,40 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -127,7 +127,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../../../contrib/sys/$(TargetFolderBase)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -139,7 +140,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../../../contrib/sys/$(TargetFolderBase)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -151,7 +153,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../../../contrib/sys/$(TargetFolderBase)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -165,7 +168,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -181,7 +185,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -197,7 +202,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../src/include;D:\davit\dev\.others_codes\rufus\src\ms-sys\inc;D:\davit\dev\.others_codes\rufus\src;../../../include;../../../contrib/zlib/contrib/zlib;../../../contrib/zlib/include</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>first_include_to_fix_rufus_problems.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -206,12 +212,70 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\br.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\fat12.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\fat16.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\fat32.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\file.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\ntfs.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\.others_codes\rufus\src\ms-sys\partition_info.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\contrib\zlib\src\util\directory_iterator_win.cpp" />
     <ClCompile Include="..\..\..\contrib\zlib\src\util\zlib_compression_routines.cpp" />
     <ClCompile Include="..\..\..\contrib\zlib\src\util\zlib_compress_decompress_common.cpp" />
     <ClCompile Include="..\..\..\contrib\zlib\src\util\zlib_decompress_routines.cpp" />
     <ClCompile Include="..\..\..\src\core\disk_clone_by_zipping_and_partition_using_zip.cpp" />
+    <ClCompile Include="..\..\..\src\core\rufus_drive.c" />
     <ClCompile Include="..\..\..\src\test\main_clonner_test.cpp" />
+    <ClCompile Include="..\..\..\src\tmp\temporary_for_fixing_rufus_symbols.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\contrib\zlib\include\zlib_compression_routines.h" />
@@ -220,6 +284,7 @@
     <ClInclude Include="..\..\..\contrib\zlib\include\zlib_first_include.h" />
     <ClInclude Include="..\..\..\include\common_disk_clonner_project_include.h" />
     <ClInclude Include="..\..\..\include\disk_clone_by_zipping_and_partition_using_zip.h" />
+    <ClInclude Include="..\..\..\src\include\first_include_to_fix_rufus_problems.h" />
     <ClInclude Include="..\..\..\src\include\private_header_for_compress_decompress.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

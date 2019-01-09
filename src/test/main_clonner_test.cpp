@@ -12,8 +12,12 @@
 #include <disk_clone_by_zipping_and_partition_using_zip.h>
 #include <zlib.h>
 #include <stdio.h>
+
 #ifdef _WIN32
 #include <conio.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <Windows.h>
 #define MAKE_FINAL_REPORT(...)	printf(__VA_ARGS__);fflush(stdout)
 #else
 #define MAKE_FINAL_REPORT(...)
@@ -27,9 +31,16 @@
 
 #ifdef BURN_DISK
 
+BEGIN_C_DECLS2
+HINSTANCE hMainInstance;
+HWND hMainDialog = NULL;
+END_C_DECLS2
+
 int main()
 {
 	int nReturn = DecompressFromPathOrUrlAndPrepareDisk(_devicename,DEST_FILE_NAME);
+
+	hMainInstance = GetModuleHandle(NULL);
 
 	MAKE_FINAL_REPORT("Press any key to exit");
 	_getch();

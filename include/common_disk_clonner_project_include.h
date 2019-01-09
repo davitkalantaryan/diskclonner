@@ -6,6 +6,10 @@
 #ifndef __common_disk_clonner_project_include_h__
 #define __common_disk_clonner_project_include_h__
 
+// these should be removed from here
+#define COMP_DECOMP_API
+#define COMP_DECOMP_VAR
+
 #ifdef __cplusplus
 #define NULLPTR2	nullptr
 #define STATIC_CAST2(_variable,_typeToCast)	( static_cast<_typeToCast>(_variable) )
@@ -62,9 +66,14 @@
 #define DLL_IMPORT2	
 #endif
 
-
-#define COMP_DECOMP_API
-#define COMP_DECOMP_VAR
+// corresponding includes during using these macroses should be included
+#ifdef _WIN32
+#define SleepMs(_timeMs)		Sleep((_timeMs))
+#define SleepMsIntr(_timeMs)	SleepEx((_timeMs),TRUE)
+#else
+#define SleepMs(_timeMs)		do{sleep((_timeMs)/1000);usleep((_timeMs)%1000);}while(0)  // here nanosleep should be used
+#define SleepMsIntr(_timeMs)	do{sleep((_timeMs)/1000);usleep((_timeMs)%1000);}while(0)
+#endif
 
 
 #endif  // #ifndef __common_disk_clonner_project_include_h__
