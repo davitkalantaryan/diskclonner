@@ -84,22 +84,22 @@ static void ClonnerThreadFunction(void)
 
 	nReturn = 0;
 returnPoint:
+	s_nReturnByClonner = nReturn?GetLastError():0;
 	if (hDriveOut != INVALID_HANDLE_VALUE) { CloseHandle(hDriveOut); }
 	if (hDriveInp != INVALID_HANDLE_VALUE) { CloseHandle(hDriveInp); }
 	s_nIsClonningActive = 0;
-	s_nReturnByClonner=nReturn;
 }
 
 
 static void CtrlThreadFunction(void)
 {
-	while(s_nShouldClonnerWork){
+	do{
 		_getch();
 		s_nKeyboardPressed = 1;
-		while(s_nKeyboardPressed){
+		while(s_nShouldClonnerWork && s_nKeyboardPressed){
 			SleepEx(INFINITE,TRUE);
 		}
-	}
+	} while (s_nShouldClonnerWork);
 }
 
 
@@ -108,7 +108,11 @@ static void PrintInfoThreadFunction(void)
 	int i,nIteration(0),nLastLinePrinted(0);
 	char cReason;
 	const char vcTickTack[2] = { '\\','/' };
-	while(s_nIsClonningActive){
+	while(s_nShouldClonnerWork && s_nIsClonningActive){
+		for (i = 0; i < nLastLinePrinted; ++i) {
+			printf("\b");
+		}
+		nLastLinePrinted = printf("progress = %lf %c  ", 100. * double(s_ullnReaded) / double(s_ullnTotalToRead), vcTickTack[(++nIteration) % 2]);
 		SleepEx(STATUS_SHOW_PERIOD_MS, TRUE);
 		while(s_nKeyboardPressed){
 			printf("\nWhich action should be done? s/c (stop/continue) ");
@@ -128,13 +132,14 @@ static void PrintInfoThreadFunction(void)
 				QueueUserAPC(APCFunction, s_ctrlThreadHandle, NULL);
 			}
 		}  // while(s_nKeyboardPressed){
-		for(i=0;i<nLastLinePrinted;++i){
-			printf("\b");
-		}
-		nLastLinePrinted=printf("progress = %lf %c",100. * double(s_ullnReaded) / double(s_ullnTotalToRead), vcTickTack[(++nIteration)%2]);
+		
 	}  // while(s_nIsClonningActive){
 
 	s_nShouldClonnerWork = 0;
-	printf("Clonning done! Press any key to exit ");
+	s_nKeyboardPressed = 0;
+	printf("\nClonning done! Error returned by thread (non 0 is systemError): %d.\n",s_nReturnByClonner);
+	printf("Press any key to exit ");
 	fflush(stdout);
+	s_nKeyboardPressed = 0;
+	QueueUserAPC(APCFunction, s_ctrlThreadHandle, NULL);
 }

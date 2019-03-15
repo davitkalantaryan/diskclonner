@@ -72,7 +72,7 @@ int CompressFromHandleToCallbackRawEx(
 
 int DecompressFromPathOrUrlAndPrepareDisk(const char* a_driveName, const char* a_cpcPathOrUrl)
 {
-	int nReturn = -1;
+	int nReturn = -;
 	int nZstrInited = 0;
 	SUserDataForDrive aUserData;
 	SFileOrNetResource aResource = { 0 };
