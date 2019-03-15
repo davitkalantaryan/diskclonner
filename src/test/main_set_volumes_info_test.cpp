@@ -44,5 +44,7 @@ returnPoint:
 	if(nReturn){
 		nReturn = GetLastError();
 	}
+	if (hDriveOut != INVALID_HANDLE_VALUE) { CloseHandle(hDriveOut); }
+	if (hDriveInp != INVALID_HANDLE_VALUE) { CloseHandle(hDriveInp); }
 	return nReturn;
 }

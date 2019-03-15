@@ -56,6 +56,7 @@ static void ClonnerThreadFunction(void)
 	HANDLE hDriveInp = INVALID_HANDLE_VALUE;
 	HANDLE hDriveOut = INVALID_HANDLE_VALUE;
 	char vcBuffer[MEMORY_OP_SIZE];
+	union { DRIVE_LAYOUT_INFORMATION_EX i; char b[8192]; }dli;
 
 	hDriveInp = CreateFileA(_devicenameInp, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hDriveInp == INVALID_HANDLE_VALUE) { goto returnPoint; }
@@ -81,6 +82,15 @@ static void ClonnerThreadFunction(void)
 	for (s_ullnReaded = 0; s_nShouldClonnerWork && ReadFile(hDriveInp, vcBuffer, MEMORY_OP_SIZE, &dwReturned, NULL) && (s_ullnReaded < s_ullnTotalToRead); s_ullnReaded += dwReturned) {
 		if (!WriteFile(hDriveOut, vcBuffer, dwReturned, NULL, NULL)) { break; }
 	}
+
+	isOk = DeviceIoControl(hDriveInp, IOCTL_DISK_GET_DRIVE_LAYOUT_EX, NULL, 0, &dli, sizeof(dli), &dwReturned, NULL);
+	if (!isOk) { goto returnPoint; }
+
+	isOk = DeviceIoControl(hDriveOut, IOCTL_DISK_SET_DRIVE_LAYOUT_EX, &dli, dwReturned, NULL, 0, &dwReturned, NULL);
+	if (!isOk) { goto returnPoint; }
+
+	isOk = DeviceIoControl(hDriveOut, IOCTL_DISK_UPDATE_PROPERTIES, NULL, 0, NULL, 0, &dwReturned, NULL);
+	if (!isOk) { goto returnPoint; }
 
 	nReturn = 0;
 returnPoint:
